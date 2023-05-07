@@ -1,0 +1,107 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+char stack[100];
+int top = -1;
+
+char *infixToPostfix(char *infix);
+
+    int isEmpty()
+{
+    if (top == -1)
+    {
+        return 1;
+    }
+    return 0;
+}
+
+void push(char c)
+{
+    top++;
+    stack[top] = c;
+}
+
+char pop()
+{
+    char c = stack[top];
+    top--;
+    return c;
+}
+
+int precedence(char c)
+{
+    if (c == '^')
+    {
+        return 3;
+    }
+    else if (c == '*' || c == '/')
+    {
+        return 2;
+    }
+    else if (c == '+' || c == '-')
+    {
+        return 1;
+    }
+    return 0;
+}
+
+
+
+char* infixToPostfix(char *infix)
+{
+    char *c, postfix[100];
+    c = infix;
+    int a = 0;
+
+    while (*c != '\0')
+    {
+        if (isalnum(*c))
+        {
+            postfix[a] = *c;
+            a++;
+        }
+        else if (*c == '(')
+        {
+            push(*c);
+        }
+        else if (*c == ')')
+        {
+            char x;
+            while ((x = pop()) != '(')
+            {
+                postfix[a] = x;
+                a++;
+            }
+        }
+        else
+        {
+            while (precedence(stack[top]) >= precedence(*c))
+            {
+                char s = pop();
+                postfix[a] = s;
+                a++;
+            }
+            push(*c);
+        }
+        c++;
+    }
+    while (top != -1)
+    {
+        char c = pop();
+        postfix[a] = c;
+        a++;
+    }
+
+    char *ptr = postfix;
+    printf("%s", postfix);
+    return ptr;
+}
+
+int main()
+{
+    char *infix, *postfix;
+    printf("Enter Infix Expression: ");
+    scanf("%s", infix);
+    infixToPostfix(infix);
+}

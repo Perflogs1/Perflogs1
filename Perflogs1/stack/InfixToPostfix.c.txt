@@ -1,0 +1,150 @@
+#include <stdio.h>
+#include <conio.h>
+#include <string.h>
+#define max 10
+
+char stack[max];
+char infix[max], postfix[max];
+int top = -1;
+
+void push(char ch);
+char pop();
+int isEmpty();
+void inToPost();
+int space(char ch);
+void print();
+int precedence(char ch);
+
+int main()
+{
+    printf("\nEnter the infix expression: ");
+    gets(infix);
+
+    inToPost();
+    print();
+    return 0;
+}
+
+int precedence(char sym)
+{
+    switch (sym)
+    {
+    case '^':
+        return 3;
+    case '*':
+    case '/':
+        return 2;
+    case '-':
+    case '+':
+        return 1;
+
+    default:
+        return 0;
+    }
+}
+
+void inToPost()
+{
+    int i, j = 0;
+    char symbol, next;
+    for (i = 0; i < strlen(infix); i++)
+    {
+        symbol = infix[i];
+        if (!space(symbol))
+        {
+            switch (symbol)
+            {
+            case '(':
+                push(symbol);
+                break;
+
+            case ')':
+                while ((next = pop()) != '(')
+                {
+                    postfix[j++] = next;
+                }
+
+            case '/':
+            case '*':
+            case '+':
+            case '-':
+            case '^':
+
+                while (!isEmpty() && precedence(stack[top]) >= precedence(symbol))
+                    postfix[j++] = pop();
+
+                push(symbol);
+                break;
+
+            default:
+                postfix[j++] = symbol;
+            }
+        }
+    }
+
+    while (!isEmpty())
+    {
+        postfix[j++] = pop();
+    }
+    postfix[j] = '\0';
+}
+
+int space(char ch)
+{
+    if (ch == ' ' || ch == '\t')
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+void print()
+{
+    int i = 0;
+    printf("\nPostfix expression is: ");
+    while (postfix[i])
+    {
+        printf("%c ", postfix[i++]);
+    }
+    printf("\n");
+}
+
+void push(char ch)
+{
+    if (top == max - 1)
+    {
+        printf("Stack is full.");
+        return;
+    }
+    top++;
+    stack[top] = ch;
+}
+
+char pop()
+{
+    if (isEmpty())
+    {
+        printf("Stack is Empty.");
+    }
+    else
+    {
+        char ch = stack[top];
+        top--;
+        return ch;
+    }
+}
+
+int isEmpty()
+{
+    if (top == -1)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
